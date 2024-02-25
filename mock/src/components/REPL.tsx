@@ -29,7 +29,6 @@ export default function REPL() {
       {/*This is where your REPLHistory might go... You also may choose to add it within your REPLInput 
       component or somewhere else depending on your component organization. What are the pros and cons of each? */}
       <REPLHistory history={history} />
-
       {/* <hr></hr> is JSX syntax for creating an HTML 
           The <hr> element is a horizontal line, typically used to separate 
           content or sections within a webpage. 

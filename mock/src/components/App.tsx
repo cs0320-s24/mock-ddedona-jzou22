@@ -4,7 +4,9 @@ import { LoginButton } from "./LoginButton";
 import REPL from "./REPL";
 
 /**
- * This is the highest level component!
+ * This is the highest level component! This is essentially what gets displayed
+ * on the main when the app is ran. It defines the props of the login button and
+ * gives it its functionality.
  */
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -15,7 +17,7 @@ function App() {
         <h1>Mock</h1>
         <LoginButton isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       </p>
-
+      {/* If the isLogginIn is true then it calls REPL */}
       {isLoggedIn && <REPL />}
     </div>
   );
