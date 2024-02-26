@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import "../styles/main.css";
 import { ControlledInput } from "./ControlledInput";
-import { REPLFunction } from "./REPLFunctions";
+import { REPLFunction } from "./REPLFunction";
+import { commandMap } from "./CommandHandler";
 
 /**
  *  Defines the props that gets passed into the function utilizing the history and dispatch.
@@ -22,7 +23,42 @@ export function REPLInput(props: REPLInputProps) {
 
   // This function is used when we submit a command input
   function handleSubmit(commandString: string) {
-    let outputArray = REPLFunction(commandString);
+    // Parse commandString and add corresponding command to invoker
+    const tokens = commandString.trim().split(/\s+/);
+    const commandName = tokens[0];
+    const commandArgs = tokens.slice(1);
+
+    const command = commandMap[commandName];
+    if (command) {
+      const result = command.execute(commandArgs);
+      props.setHistory([...props.history, result]);
+    } else {
+      props.setHistory([...props.history, `Unknown command: ${commandName}`]);
+    }
+
+    // if (tokens[0] === "mode" && tokens[1] === "brief" && tokens.length <= 2) {
+    //   props.setVerbose(false);
+    // } else if (
+    //   tokens[0] === "mode" &&
+    //   tokens[1] === "verbose" &&
+    //   tokens.length <= 2
+    // ) {
+    //   props.setVerbose(true);
+    // }
+
+    // if (!props.verbose) {
+    //   //TODO
+    //   //commandProcessor = new BriefModeCommand([]);
+    // } else {
+    //   //TODO
+    //   //commandProcessor = new VerboseModeCommand();
+    // }
+
+    //TODO
+    // if (commandProcessor) {
+    //   commandProcessor.execute();
+    // }
+
     // we change the counter, rewrite history, and clear the command input
     setCount(count + 1);
     // props.setHistory([...props.history, currentCommand]);
