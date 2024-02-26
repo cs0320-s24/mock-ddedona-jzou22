@@ -30,8 +30,12 @@ export function REPLInput(props: REPLInputProps) {
 
     const command = commandMap[commandName];
     if (command) {
-      const result = command.execute(commandArgs);
-      props.setHistory([...props.history, result]);
+      const result = command(commandArgs);
+      if (!props.verbose) {
+        props.setHistory([...props.history, result]);
+      } else if (props.verbose) {
+        props.setHistory([...props.history, commandName, result]);
+      }
     } else {
       props.setHistory([...props.history, `Unknown command: ${commandName}`]);
     }
