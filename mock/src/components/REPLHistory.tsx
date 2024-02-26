@@ -33,6 +33,7 @@ export function REPLHistory(props: REPLHistoryProps) {
             (the current element) and index (the index of the current element 
             in the array). 
             */}
+
       {props.history.map((command, index) => (
         <p>{command}</p>
       ))}
