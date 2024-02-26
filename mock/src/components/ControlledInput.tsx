@@ -18,6 +18,7 @@ import { Dispatch, SetStateAction } from "react";
  */
 interface ControlledInputProps {
   value: string;
+
   // This type comes from React+TypeScript. VSCode can suggest these.
   //   Concretely, this means "a function that sets a state containing a string"
   setValue: Dispatch<SetStateAction<string>>;
@@ -42,7 +43,7 @@ export function ControlledInput({
       type="text"
       className="repl-command-box"
       value={value}
-      placeholder="Enter command here!"
+      placeholder="Enter command here, e.g. -mode verbose-"
       /* 
       This sets up an event handler for the onChange event. When the input value 
       changes, it calls the setValue function, updating the state with the new 
@@ -53,8 +54,8 @@ export function ControlledInput({
 
       (e) => setValue(e.target.value): This is an arrow function that takes an 
             event (e) as a parameter. Inside the function, setValue is a function
-             used to update the state, and e.target.value represents the new 
-             value of the input field
+            used to update the state, and e.target.value represents the new 
+            value of the input field
       */
       onChange={(e) => setValue(e.target.value)}
       aria-label={ariaLabel}
