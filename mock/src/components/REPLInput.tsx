@@ -31,7 +31,13 @@ export function REPLInput(props: REPLInputProps) {
     const command = commandMap[commandName];
     if (command) {
       const result = command(commandArgs);
-      if (!props.verbose) {
+      if (commandName === "mode" && commandArgs[0] === "brief") {
+        props.setVerbose(false);
+        props.setHistory([...props.history, result]);
+      } else if (commandName === "mode" && commandArgs[0] === "verbose") {
+        props.setVerbose(true);
+        props.setHistory([...props.history, commandName, result]);
+      } else if (!props.verbose) {
         props.setHistory([...props.history, result]);
       } else if (props.verbose) {
         props.setHistory([...props.history, commandName, result]);
