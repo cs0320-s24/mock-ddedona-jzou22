@@ -8,6 +8,8 @@ import { ControlledInput } from "./ControlledInput";
 interface REPLInputProps {
   history: string[];
   setHistory: Dispatch<SetStateAction<string[]>>;
+  verbose: boolean;
+  setVerbose: Dispatch<SetStateAction<boolean>>;
 }
 /**
  * Handles the user's current input and add it into the history
@@ -19,10 +21,25 @@ export function REPLInput(props: REPLInputProps) {
 
   // This function is used when we submit a command input
   function handleSubmit(commandString: string) {
+    const tokens = tokenizeCommandString(commandString);
+    // changes the mode to either brief or verbose depending on the user input
+    if (tokens[0] === "mode" && tokens[1] === "brief" && tokens.length <= 2) {
+      props.setVerbose(false);
+    }
+
+    if (tokens[0] === "mode" && tokens[1] === "verbose" && tokens.length <= 2) {
+      props.setVerbose(true);
+    }
+
     // we change the counter, rewrite history, and clear the command input
     setCount(count + 1);
     props.setHistory([...props.history, commandString]);
     setCommandString("");
+  }
+
+  function tokenizeCommandString(commandString: string): string[] {
+    // Split the command string by whitespace
+    return commandString.trim().split(/\s+/);
   }
 
   return (
@@ -40,6 +57,9 @@ export function REPLInput(props: REPLInputProps) {
       <button onClick={() => handleSubmit(commandString)}>
         Submitted {count} times
       </button>
+      <div>
+        <legend>Current Mode: {props.verbose ? "verbose" : "brief"}</legend>
+      </div>
     </div>
   );
 }
