@@ -22,18 +22,29 @@ export function REPLInput(props: REPLInputProps) {
   // This function is used when we submit a command input
   function handleSubmit(commandString: string) {
     const tokens = tokenizeCommandString(commandString);
+
     // changes the mode to either brief or verbose depending on the user input
     if (tokens[0] === "mode" && tokens[1] === "brief" && tokens.length <= 2) {
       props.setVerbose(false);
-    }
-
-    if (tokens[0] === "mode" && tokens[1] === "verbose" && tokens.length <= 2) {
+    } else if (
+      tokens[0] === "mode" &&
+      tokens[1] === "verbose" &&
+      tokens.length <= 2
+    ) {
       props.setVerbose(true);
+    } else if (props.verbose === true) {
+      let commandName = "Command: " + commandString;
+      let commandOutput = "Output: PLACEHOLDER";
+
+      props.setHistory([...props.history, commandName, commandOutput]);
+    } else {
+      let briefOutput = commandString;
+      props.setHistory([...props.history, briefOutput]);
     }
 
     // we change the counter, rewrite history, and clear the command input
     setCount(count + 1);
-    props.setHistory([...props.history, commandString]);
+    // props.setHistory([...props.history, currentCommand]);
     setCommandString("");
   }
 
