@@ -1,4 +1,5 @@
 import "../styles/main.css";
+import { historyType } from "./REPL";
 
 /**
  * REPLHistoryProps Interface
@@ -10,7 +11,7 @@ import "../styles/main.css";
 interface REPLHistoryProps {
   // TODO: Fill with some shared state tracking all the pushed commands
   // CHANGED
-  history: string[];
+  history: historyType[];
 }
 
 /**
@@ -21,21 +22,47 @@ interface REPLHistoryProps {
  * paragraph, creating a list of paragraphs representing the command history.
  */
 export function REPLHistory(props: REPLHistoryProps) {
+  // return (
+  //   <div className="repl-history">
+  //     {/* This is where command history will go */}
+  //     {/* TODO: To go through all the pushed commands... try the .map() function! */}
+  //     {/* CHANGED */}
+
+  //     {/* The map function is called on the history array. It iterates
+  //           over each element of the array, and for each element, it executes
+  //           the provided function. The function takes two parameters: command
+  //           (the current element) and index (the index of the current element
+  //           in the array).
+  //           */}
+
+  //     {
+  //       props.history.map((command, index) => (
+  //         <p>{command}</p>
+  //       ))
+  //     }
+  //   </div>
+  // );
+
   return (
     <div className="repl-history">
-      {/* This is where command history will go */}
-      {/* TODO: To go through all the pushed commands... try the .map() function! */}
-      {/* CHANGED */}
-
-      {/* The map function is called on the history array. It iterates 
-            over each element of the array, and for each element, it executes 
-            the provided function. The function takes two parameters: command 
-            (the current element) and index (the index of the current element 
-            in the array). 
-            */}
-
       {props.history.map((command, index) => (
-        <p>{command}</p>
+        <div key={index}>
+          {typeof command.output === "string" ? (
+            <p>{command.output}</p>
+          ) : (
+            <table>
+              <tbody>
+                {command.output.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       ))}
     </div>
   );

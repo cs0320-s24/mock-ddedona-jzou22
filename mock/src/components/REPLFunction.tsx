@@ -8,8 +8,5 @@ import { Dispatch, SetStateAction, useState } from "react";
  */
 
 export interface REPLFunction {
-  (args: Array<string>): string;
-  //setVerbose: Dispatch<SetStateAction<boolean>>;
-  //execute(): (args: Array<string>) => string;
-  //call: (args: Array<string>) => string | string[][];
+  (args: Array<string>): string | string[][];
 }

@@ -2,21 +2,25 @@ import { Dispatch, SetStateAction, useState } from "react";
 import "../styles/main.css";
 import { ControlledInput } from "./ControlledInput";
 import { REPLFunction } from "./REPLFunction";
-import { commandMap } from "./CommandHandler";
+import { commandMap, setInitiaCommandlMap } from "./CommandHandler";
+import { historyType } from "./REPL";
 
 /**
  *  Defines the props that gets passed into the function utilizing the history and dispatch.
  */
 interface REPLInputProps {
-  history: string[];
-  setHistory: Dispatch<SetStateAction<string[]>>;
+  history: historyType[];
+  setHistory: Dispatch<SetStateAction<historyType[]>>;
   verbose: boolean;
   setVerbose: Dispatch<SetStateAction<boolean>>;
 }
+
 /**
  * Handles the user's current input and add it into the history
  */
 export function REPLInput(props: REPLInputProps) {
+  setInitiaCommandlMap();
+
   // Initialzies the current command inputs
   const [commandString, setCommandString] = useState<string>("");
   const [count, setCount] = useState<number>(0);
@@ -28,46 +32,36 @@ export function REPLInput(props: REPLInputProps) {
     const commandName = tokens[0];
     const commandArgs = tokens.slice(1);
 
-    const command = commandMap[commandName];
+    const command = commandMap.get(commandName);
+
     if (command) {
       const result = command(commandArgs);
+      const historyEntry: historyType = { output: result };
       if (commandName === "mode" && commandArgs[0] === "brief") {
         props.setVerbose(false);
-        props.setHistory([...props.history, result]);
+        props.setHistory([...props.history, historyEntry]);
       } else if (commandName === "mode" && commandArgs[0] === "verbose") {
         props.setVerbose(true);
-        props.setHistory([...props.history, commandName, result]);
+        props.setHistory([
+          ...props.history,
+          { output: commandName },
+          historyEntry,
+        ]);
       } else if (!props.verbose) {
-        props.setHistory([...props.history, result]);
+        props.setHistory([...props.history, historyEntry]);
       } else if (props.verbose) {
-        props.setHistory([...props.history, commandName, result]);
+        props.setHistory([
+          ...props.history,
+          { output: commandName },
+          historyEntry,
+        ]);
       }
     } else {
-      props.setHistory([...props.history, `Unknown command: ${commandName}`]);
+      props.setHistory([
+        ...props.history,
+        { output: `Unknown command: ${commandName}` },
+      ]);
     }
-
-    // if (tokens[0] === "mode" && tokens[1] === "brief" && tokens.length <= 2) {
-    //   props.setVerbose(false);
-    // } else if (
-    //   tokens[0] === "mode" &&
-    //   tokens[1] === "verbose" &&
-    //   tokens.length <= 2
-    // ) {
-    //   props.setVerbose(true);
-    // }
-
-    // if (!props.verbose) {
-    //   //TODO
-    //   //commandProcessor = new BriefModeCommand([]);
-    // } else {
-    //   //TODO
-    //   //commandProcessor = new VerboseModeCommand();
-    // }
-
-    //TODO
-    // if (commandProcessor) {
-    //   commandProcessor.execute();
-    // }
 
     // we change the counter, rewrite history, and clear the command input
     setCount(count + 1);
