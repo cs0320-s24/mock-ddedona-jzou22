@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
 /**
  * This component deals with the "Login" button interactions on click
@@ -20,13 +21,27 @@ export function LoginButton(props: loginProps) {
    * @returns a boolean - indicates if isLoggedIn is now true or false after
    * being called onClick
    */
-  const authenticate = () => {
-    const newValue = !props.isLoggedIn;
-    props.setIsLoggedIn(newValue);
-    return newValue;
+  const [username, setUsername] = useState("");
+
+  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
   };
 
-  // !!! TODO: make access to the application is protected by a username?? !!!
+  const authenticate = () => {
+    if (props.isLoggedIn) {
+      // If already logged in, sign out
+      props.setIsLoggedIn(false);
+      setUsername(""); // Clear the username
+    } else {
+      if (username.endsWith("@brown.edu")) {
+        const newValue = !props.isLoggedIn;
+        props.setIsLoggedIn(newValue);
+        return newValue;
+      } else {
+        alert("Invalid email format. Please use a @brown.edu email.");
+      }
+    }
+  };
 
   if (props.isLoggedIn) {
     return (
@@ -36,9 +51,17 @@ export function LoginButton(props: loginProps) {
     );
   } else {
     return (
-      <button aria-label="Login" onClick={authenticate}>
-        Login
-      </button>
+      <div>
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={username}
+          onChange={handleUsername}
+        />
+        <button aria-label="Login" onClick={authenticate}>
+          Login
+        </button>
+      </div>
     );
   }
 }
