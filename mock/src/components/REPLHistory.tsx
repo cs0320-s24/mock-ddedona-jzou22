@@ -1,4 +1,5 @@
 import "../styles/main.css";
+import { HistoryEntry } from "./REPL";
 
 /**
  * REPLHistoryProps Interface
@@ -9,7 +10,7 @@ import "../styles/main.css";
  */
 interface REPLHistoryProps {
   // Initialize the history tpye
-  history: string[];
+  history: HistoryEntry[];
 }
 
 /**

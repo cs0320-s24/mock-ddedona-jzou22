@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
+import { HistoryEntry } from "./REPL";
 /**
  * A command-processor function for our REPL. The function returns a string,
  * which is the value to print to history when the command is done executing.
@@ -8,5 +9,8 @@ import { Dispatch, SetStateAction, useState } from "react";
  */
 
 export interface REPLFunction {
-  (args: Array<string>, setVerbose: Dispatch<SetStateAction<boolean>>): string;
+  (
+    args: Array<string>,
+    setVerbose: Dispatch<SetStateAction<boolean>>
+  ): HistoryEntry;
 }

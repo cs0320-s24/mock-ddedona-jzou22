@@ -3,13 +3,14 @@ import "../styles/main.css";
 import { ControlledInput } from "./ControlledInput";
 import { REPLFunction } from "./REPLFunction";
 import { commandMap, setCommandMap } from "./Commands";
+import { HistoryEntry } from "./REPL";
 
 /**
  * Defines the props that gets passed into the function utilizing the history and dispatch.
  */
 interface REPLInputProps {
-  history: string[];
-  setHistory: Dispatch<SetStateAction<string[]>>;
+  history: HistoryEntry[];
+  setHistory: Dispatch<SetStateAction<HistoryEntry[]>>;
   verbose: boolean;
   setVerbose: Dispatch<SetStateAction<boolean>>;
 }
@@ -31,6 +32,7 @@ export function REPLInput(props: REPLInputProps) {
     if (command) {
       // Execute the command function
       const result = command(commandArgs, props.setVerbose);
+
       // Handle special cases for mode commands and the history of changing to that mode
       if (commandName === "mode") {
         if (commandArgs[0] === "brief") {
@@ -49,14 +51,20 @@ export function REPLInput(props: REPLInputProps) {
           ]);
         }
       } else {
-        // For other commands, simply add the result to history
-        props.setHistory([...props.history, result]);
+        if (props.verbose) {
+          // For other commands, simply add the result to history
+          props.setHistory([
+            ...props.history,
+            "Command: " + commandString,
+            "Output: " + result,
+          ]);
+        } else {
+          props.setHistory([...props.history, result]);
+        }
       }
     } else {
       // Handle unknown commands
-      if (props.verbose) {
-        props.setHistory([...props.history, "Unknown command: " + commandName]);
-      }
+      props.setHistory([...props.history, "Unknown command: " + commandName]);
     }
     // Clear the command input
     setCommandString("");
