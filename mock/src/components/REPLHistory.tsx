@@ -20,14 +20,67 @@ interface REPLHistoryProps {
  * strings in the history array. It maps each command in the array to a
  * paragraph, creating a list of paragraphs representing the command history.
  */
+// export function REPLHistory(props: REPLHistoryProps) {
+//   return (
+//     <div className="repl-history" aria-label="repl-history">
+//       {/* This is where command history will go */}
+//       {/* TODO: To go through all the pushed commands... try the .map() function! */}
+//       {/* CHANGED */}
+//       {props.history.map((command, index) => (
+//         <p key={index}>{command}</p>
+//       ))}
+//     </div>
+//   );
+// }
+
+// export function REPLHistory(props: REPLHistoryProps) {
+//   return (
+//     <div className="repl-history" aria-label="repl-history">
+//       {props.history.map((entry, index) => (
+//         <div key={index} className="history-entry">
+//           <p className="output-label">Output:</p>
+//           {Array.isArray(entry) ? (
+//             <table className="output-table">
+//               <tbody>
+//                 {entry.map((row, rowIndex) => (
+//                   <tr key={rowIndex}>
+//                     {row.map((cell, cellIndex) => (
+//                       <td key={cellIndex}>{cell}</td>
+//                     ))}
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           ) : (
+//             <p className="output-text">{entry}</p>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
+
 export function REPLHistory(props: REPLHistoryProps) {
   return (
     <div className="repl-history" aria-label="repl-history">
-      {/* This is where command history will go */}
-      {/* TODO: To go through all the pushed commands... try the .map() function! */}
-      {/* CHANGED */}
-      {props.history.map((command, index) => (
-        <p key={index}>{command}</p>
+      {props.history.map((entry, index) => (
+        <div key={index} className="history-entry">
+          {Array.isArray(entry) ? (
+            <table className="output-table">
+              <tbody>
+                {entry.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="output-label">{entry}</p>
+          )}
+        </div>
       ))}
     </div>
   );

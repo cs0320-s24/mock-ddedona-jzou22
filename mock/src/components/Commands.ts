@@ -69,5 +69,5 @@ const view: REPLFunction = (
     return "No data has been loaded yet.";
   }
   // Parse the original string into a 2D array
-  return loadedData;
+  return loadedData.map((row) => [...row]);
 };
