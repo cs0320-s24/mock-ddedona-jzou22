@@ -1,6 +1,7 @@
 import { serialize } from "v8";
 import { REPLFunction } from "./REPLFunction";
 import { readFileSync } from "fs";
+import { Dispatch, SetStateAction, useState } from "react";
 
 /* 
 Possible way 1 to define handleModeCommand
@@ -8,45 +9,27 @@ Possible way 1 to define handleModeCommand
 results in an error within handleModeCommand itself
 */
 
-const handleModeCommand: REPLFunction = (
-  args: Array<string>
-  //props: REPLFunction
+const mode: REPLFunction = (
+  args: Array<string>,
+  setVerbose: Dispatch<SetStateAction<boolean>>
 ): string => {
   // logic for handling mode command
-
   const modeArgument = args[0];
-  const followingArgument = args[1];
-  if (modeArgument === "brief") {
-    //props.setVerbose(false);
-    return "Switched to brief mode";
-  } else if (modeArgument === "verbose") {
-    //props.setVerbose(true);
-    return "Switched to verbose mode";
+  const invalidArgument = args[1];
+  if (invalidArgument) {
+    return "Invalid mode command size";
   } else {
-    return 'Invalid mode argument. Use "brief" or "verbose".';
+    if (modeArgument === "brief") {
+      setVerbose(false);
+      return "Switched to brief mode";
+    } else if (modeArgument === "verbose") {
+      setVerbose(true);
+      return "Switched to verbose mode";
+    } else {
+      return "Invalid mode type";
+    }
   }
 };
-
-/* 
-Possible way 2 to define handleModeCommand
-
-results in an error within const commandMap itself
-*/
-
-// function handleModeCommand(args: Array<string>, props: REPLFunction) {
-//   // logic for handling mode command
-
-//   const modeArgument = args[0];
-//   if (modeArgument === "brief") {
-//     props.setVerbose(false);
-//     return "Switched to brief mode";
-//   } else if (modeArgument === "verbose") {
-//     props.setVerbose(true);
-//     return "Switched to verbose mode";
-//   } else {
-//     return 'Invalid mode argument. Use "brief" or "verbose".';
-//   }
-// }
 
 const load: REPLFunction = (args: Array<string>): string => {
   // logic for handling mode command
@@ -102,9 +85,11 @@ export function removeCommand(name: string) {
  * used to set the inital map of commands that can be used
  * Called within REPLInputs
  */
-export function setInitiaCommandlMap() {
+export function setCommandMap() {
   // Set initial values for commandMap
-  commandMap.set("mode", handleModeCommand);
+  commandMap.set("mode", mode);
   commandMap.set("load_file", load);
-  commandMap.set("test", test);
+  // commandMap.set("view", view)
+  // commandMap.set("search", search)
+  // commandMap.set("test", test);
 }
