@@ -17,7 +17,6 @@ function App() {
         <h1>Mock</h1>
         <LoginButton isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       </p>
-      {/* If the isLogginIn is true then it calls REPL */}
       {isLoggedIn && <REPL />}
     </div>
   );
