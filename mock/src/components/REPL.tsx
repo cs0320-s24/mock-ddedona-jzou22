@@ -16,20 +16,12 @@ import { REPLInput } from "./REPLInput";
 */
 
 /**
- * creating a new datattype
- */
-export type historyType = {
-  output: string | string[][];
-};
-
-/**
  * This REPL is a React functional component, representing a part of the user
  * interface
  */
 export default function REPL() {
-  // TODO: Add some kind of shared state that holds all the commands submitted.
-  // CHANGED
-  const [history, setHistory] = useState<historyType[]>([]);
+  // Shared states among the REPL components
+  const [history, setHistory] = useState<string[]>([]);
   const [verbose, setVerbose] = useState<boolean>(false);
 
   return (

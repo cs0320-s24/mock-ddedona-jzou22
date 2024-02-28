@@ -2,76 +2,68 @@ import { Dispatch, SetStateAction, useState } from "react";
 import "../styles/main.css";
 import { ControlledInput } from "./ControlledInput";
 import { REPLFunction } from "./REPLFunction";
-import { commandMap, setInitiaCommandlMap } from "./CommandHandler";
-import { historyType } from "./REPL";
+import { commandMap, setCommandMap } from "./Commands";
 
 /**
- *  Defines the props that gets passed into the function utilizing the history and dispatch.
+ * Defines the props that gets passed into the function utilizing the history and dispatch.
  */
 interface REPLInputProps {
-  history: historyType[];
-  setHistory: Dispatch<SetStateAction<historyType[]>>;
+  history: string[];
+  setHistory: Dispatch<SetStateAction<string[]>>;
   verbose: boolean;
   setVerbose: Dispatch<SetStateAction<boolean>>;
 }
 
-/**
- * Handles the user's current input and add it into the history
- */
 export function REPLInput(props: REPLInputProps) {
-  setInitiaCommandlMap();
+  setCommandMap();
 
-  // Initialzies the current command inputs
   const [commandString, setCommandString] = useState<string>("");
-  const [count, setCount] = useState<number>(0);
 
-  // This function is used when we submit a command input
+  // For simplicity, invalid commands will be one line on the history
   function handleSubmit(commandString: string) {
-    // Parse commandString and add corresponding command to invoker
     const tokens = commandString.trim().split(/\s+/);
     const commandName = tokens[0];
     const commandArgs = tokens.slice(1);
 
     const command = commandMap.get(commandName);
 
+    // Check if the command exists in the command map
     if (command) {
-      const result = command(commandArgs);
-      const historyEntry: historyType = { output: result };
-      if (commandName === "mode" && commandArgs[0] === "brief") {
-        props.setVerbose(false);
-        props.setHistory([...props.history, historyEntry]);
-      } else if (commandName === "mode" && commandArgs[0] === "verbose") {
-        props.setVerbose(true);
-        props.setHistory([
-          ...props.history,
-          { output: commandName },
-          historyEntry,
-        ]);
-      } else if (!props.verbose) {
-        props.setHistory([...props.history, historyEntry]);
-      } else if (props.verbose) {
-        props.setHistory([
-          ...props.history,
-          { output: commandName },
-          historyEntry,
-        ]);
+      // Execute the command function
+      const result = command(commandArgs, props.setVerbose);
+      // Handle special cases for mode commands and the history of changing to that mode
+      if (commandName === "mode") {
+        if (commandArgs[0] === "brief") {
+          props.setHistory([...props.history, result]);
+        } else if (commandArgs[0] === "verbose") {
+          props.setHistory([
+            ...props.history,
+            "Command: " + commandString,
+            "Output: " + result,
+          ]);
+        } else {
+          // Handle invalid mode arguments
+          props.setHistory([
+            ...props.history,
+            "Invalid mode argument. Use 'brief' or 'verbose'.",
+          ]);
+        }
+      } else {
+        // For other commands, simply add the result to history
+        props.setHistory([...props.history, result]);
       }
     } else {
-      props.setHistory([
-        ...props.history,
-        { output: `Unknown command: ${commandName}` },
-      ]);
+      // Handle unknown commands
+      if (props.verbose) {
+        props.setHistory([...props.history, "Unknown command: " + commandName]);
+      }
     }
-
-    // we change the counter, rewrite history, and clear the command input
-    setCount(count + 1);
-    // props.setHistory([...props.history, currentCommand]);
+    // Clear the command input
     setCommandString("");
   }
 
   return (
     <div className="repl-input">
-      {/* Uses a fieldset to format the repl command*/}
       <fieldset>
         <legend>Enter a command:</legend>
         <ControlledInput
@@ -80,10 +72,7 @@ export function REPLInput(props: REPLInputProps) {
           ariaLabel={"Command input"}
         />
       </fieldset>
-      {/* On click, it will call the handleSubmit and display the counter times*/}
-      <button onClick={() => handleSubmit(commandString)}>
-        Submitted {count} times
-      </button>
+      <button onClick={() => handleSubmit(commandString)}>Submit</button>
       <div>
         <legend>Current Mode: {props.verbose ? "verbose" : "brief"}</legend>
       </div>
