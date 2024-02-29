@@ -9,8 +9,7 @@ import { HistoryEntry } from "./REPL";
  */
 
 export interface REPLFunction {
-  (
-    args: Array<string>,
-    setVerbose: Dispatch<SetStateAction<boolean>>
-  ): HistoryEntry;
+  (args: Array<string>, setVerbose: Dispatch<SetStateAction<boolean>>):
+    | string
+    | string[][];
 }
