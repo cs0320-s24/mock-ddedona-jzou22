@@ -71,14 +71,14 @@ export function REPLInput(props: REPLInputProps) {
             props.setHistory([
               ...props.history,
               "Command: " + commandString,
-              "Output:",
+              "Output: ",
               result,
             ]);
           } else {
             props.setHistory([
               ...props.history,
               "Command: " + commandString,
-              "Output:" + result,
+              "Output: " + result,
             ]);
           }
         } else {
