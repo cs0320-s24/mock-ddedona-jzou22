@@ -15,6 +15,20 @@ interface REPLInputProps {
   setVerbose: Dispatch<SetStateAction<boolean>>;
 }
 
+function isStringArray2D(value: any): value is string[][] {
+  if (!Array.isArray(value)) {
+    return false;
+  }
+
+  return value.every((innerArray) => {
+    if (!Array.isArray(innerArray)) {
+      return false;
+    }
+
+    return innerArray.every((item) => typeof item === "string");
+  });
+}
+
 export function REPLInput(props: REPLInputProps) {
   setCommandMap();
 
@@ -53,11 +67,20 @@ export function REPLInput(props: REPLInputProps) {
       } else {
         if (props.verbose) {
           // For other commands, simply add the result to history
-          props.setHistory([
-            ...props.history,
-            "Command: " + commandString,
-            "Output: " + result,
-          ]);
+          if (Array.isArray(result)) {
+            props.setHistory([
+              ...props.history,
+              "Command: " + commandString,
+              "Output:",
+              result,
+            ]);
+          } else {
+            props.setHistory([
+              ...props.history,
+              "Command: " + commandString,
+              "Output:" + result,
+            ]);
+          }
         } else {
           props.setHistory([...props.history, result]);
         }

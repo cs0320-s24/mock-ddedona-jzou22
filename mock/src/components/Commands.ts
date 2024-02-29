@@ -9,6 +9,17 @@ export const commandMap = new Map<string, REPLFunction>();
 // Create a varaible to store the file
 let loadedData: string[][];
 
+export function addCommand(
+  commandName: string,
+  commandFunction: REPLFunction
+): void {
+  commandMap.set(commandName, commandFunction);
+}
+
+export function removeCommand(commandName: string): void {
+  commandMap.delete(commandName);
+}
+
 // Initialize the basic commands
 export function setCommandMap() {
   // Set initial values for commandMap
