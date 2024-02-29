@@ -1,6 +1,6 @@
 import { REPLFunction } from "./REPLFunction";
 import { Dispatch, SetStateAction, useState } from "react";
-import { mockedDataMap } from "./mockedJson";
+import { mockedDataMap, mockedResultsMap } from "./mockedJson";
 import { HistoryEntry } from "./REPL";
 
 // An export that REPLInput can use to map certain commands to functions
@@ -91,55 +91,16 @@ const search: REPLFunction = (
     return "No data has been loaded yet.";
   }
 
-  const firstArg = args[0];
-  const secondArg = args[1];
-
-  // Check if the searchColumnOrValue is an index or a valid column name
-  const columnIndex = parseInt(firstArg);
-  const hasHeaders = file?.hasHeaders === true; // Explicitly check if true
-  let resultRows: string[][];
-
-  if (args.length === 1) {
-    if (hasHeaders) {
-      resultRows = loadedData
-        .slice(1)
-        .filter((row) => row.some((cell) => cell === firstArg));
-    } else {
-      resultRows = loadedData.filter((row) =>
-        row.some((cell) => cell === firstArg)
-      );
-    }
-  } else if (args.length === 2) {
-    if (
-      !isNaN(columnIndex) &&
-      columnIndex >= 0 &&
-      columnIndex < loadedData[0].length
-    ) {
-      // Search by index
-      resultRows = loadedData.filter((row) => row[columnIndex] === secondArg);
-    } else if (hasHeaders) {
-      // Search by column name
-      const headerRow = loadedData[0];
-      const columnIndexByName = headerRow.indexOf(firstArg);
-
-      if (columnIndexByName !== -1) {
-        resultRows = loadedData.filter(
-          (row) => row[columnIndexByName] === secondArg
-        );
-      } else {
-        return "Invalid column name. Please provide a valid column index or name.";
-      }
-    } else {
-      // Search across all columns
-      resultRows = loadedData.filter((row) =>
-        row.some((cell) => cell === firstArg)
-      );
-    }
-
-    return resultRows.length > 0 ? resultRows : "No matching rows found.";
-  } else {
+  if (args.length !== 2) {
     return "Invalid number of arguments. Please either <column name/index> <search value> or just <search value>.";
   }
 
-  return "Error in searching";
+  const searchIndexOrName = args[0];
+  const searchValue = args[1];
+
+  const mockedSearchValue = searchIndexOrName + searchValue;
+
+  const searchRes = mockedResultsMap.get(mockedSearchValue);
+
+  return searchRes ? searchRes : "No matching rows found.";
 };

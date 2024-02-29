@@ -60,3 +60,11 @@ mockedDataMap.set("exampleCSV2.csv", exampleCSV2);
 mockedDataMap.set("exampleCSV3.csv", exampleCSV3);
 mockedDataMap.set("header.csv", header);
 mockedDataMap.set("noHeader.csv", noHeader);
+
+export const mockedResultsMap = new Map<string, string[][]>();
+
+const exampleCSV11The = [["The", "song", "remains", "the", "same."]];
+const exampleCSV11Song = [["The", "song", "remains", "the", "same."]];
+
+mockedResultsMap.set("1The", exampleCSV11The);
+mockedResultsMap.set("1Song", exampleCSV11Song);
