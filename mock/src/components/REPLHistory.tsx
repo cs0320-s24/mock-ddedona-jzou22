@@ -32,7 +32,13 @@ export function REPLHistory(props: REPLHistoryProps) {
                 {entry.map((row, rowIndex) => (
                   <tr key={rowIndex}>
                     {row.map((cell, cellIndex) => (
-                      <td key={cellIndex}>{cell}</td>
+                      <td
+                        key={cellIndex}
+                        className="output-cell"
+                        style={{ width: `${100 / row.length}%` }}
+                      >
+                        {cell}
+                      </td>
                     ))}
                   </tr>
                 ))}
