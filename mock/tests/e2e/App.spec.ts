@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-
+import { chromium } from "playwright";
 
 /**
   The general shapes of tests in Playwright Test are:
@@ -9,60 +9,178 @@ import { expect, test } from "@playwright/test";
   Look for this pattern in the tests below!
  */
 
-// If you needed to do something before every test case...
-test.beforeEach(() => {
-    // ... you'd put it here.
-    // TODO: Is there something we need to do before every test case to avoid repeating code?
-  })
-
-/**
- * Don't worry about the "async" yet. We'll cover it in more detail
- * for the next sprint. For now, just think about "await" as something 
- * you put before parts of your test that might take time to run, 
- * like any interaction with the page.
- */
-test('on page load, i see a login button', async ({ page }) => {
-  // Notice: http, not https! Our front-end is not set up for HTTPs.
-  await page.goto('http://localhost:8000/');
-  await expect(page.getByLabel('Login')).toBeVisible()
-})
-
-test('on page load, i dont see the input box until login', async ({ page }) => {
-  // Notice: http, not https! Our front-end is not set up for HTTPs.
-  await page.goto('http://localhost:8000/');
-  await expect(page.getByLabel('Sign Out')).not.toBeVisible()
-  await expect(page.getByLabel('Command input')).not.toBeVisible()
-  
-  // click the login button
-  await page.getByLabel('Login').click();
-  await expect(page.getByLabel('Sign Out')).toBeVisible()
-  await expect(page.getByLabel('Command input')).toBeVisible()
-})
-
-test('after I type into the input box, its text changes', async ({ page }) => {
-  // Step 1: Navigate to a URL
-  await page.goto('http://localhost:8000/');
-  await page.getByLabel('Login').click();
-
-  // Step 2: Interact with the page
-  // Locate the element you are looking for
-  await page.getByLabel('Command input').click();
-  await page.getByLabel('Command input').fill('Awesome command');
-
-  // Step 3: Assert something about the page
-  // Assertions are done by using the expect() function
-  const mock_input = `Awesome command`
-  await expect(page.getByLabel('Command input')).toHaveValue(mock_input)
+// Test initial display of the website
+test("on page load, i see a login button and text", async ({ page }) => {
+  await page.goto("http://localhost:8000/");
+  // Looks for login button
+  await expect(page.getByLabel("Login")).toBeVisible();
+  // Should be a text field with a place holder
+  await expect(page.getByPlaceholder("Enter username")).toBeVisible();
 });
 
-test('on page load, i see a button', async ({ page }) => {
-  // TODO WITH TA: Fill this in!
+// Test correct login
+test("login attempt", async ({ page }) => {
+  await page.goto("http://localhost:8000/");
+
+  const textField = await page.waitForSelector('input[type="text"]');
+  const loginButton = await page.waitForSelector('button[aria-label="Login"]');
+
+  // Interact with these components
+  await textField.type("@brown.edu");
+  await loginButton.click();
+
+  // Should display signout and command input
+  await expect(page.getByLabel("Sign Out")).toBeVisible();
+  await expect(page.getByLabel("repl-history")).toBeVisible();
+  await expect(page.getByLabel("Command input")).toBeVisible();
 });
 
-test('after I click the button, its label increments', async ({ page }) => {
-  // TODO WITH TA: Fill this in to test your button counter functionality!
+// Test incorrect login
+test("incorrect login attempt", async ({ page }) => {
+  await page.goto("http://localhost:8000/");
+
+  const textField = await page.waitForSelector('input[type="text"]');
+  const loginButton = await page.waitForSelector('button[aria-label="Login"]');
+
+  // Interact with these components
+  await textField.type("wrong email"); // Correct email format
+  await loginButton.click();
+
+  // Should not display signout and command input after incorrect login attempt
+  await expect(page.getByLabel("Sign Out")).not.toBeVisible();
 });
 
-test('after I click the button, my command gets pushed', async ({ page }) => {
-  // TODO: Fill this in to test your button push functionality!
+//test mode
+test("mode verbose command in REPLInput updates history and mode", async ({
+  page,
+}) => {
+  // Navigate to the page containing the REPLInput component
+  await page.goto("http://localhost:8000/");
+
+  // Log in and submit the command "mode verbose"
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+  await page.fill('input[type="text"]', "mode verbose");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the history to update with the command and its output
+  await page.waitForSelector('div:has-text("Command: mode verbose")');
+  await page.waitForSelector(
+    'div:has-text("Output: Switched to verbose mode")'
+  );
+
+  // Verify that the current mode is displayed as "verbose"
+  const currentMode = await page.textContent(
+    'legend:has-text("Current Mode: verbose")'
+  );
+  expect(currentMode).toBeTruthy();
+});
+
+// test mode
+test("mode brief command in REPLInput updates history and mode", async ({
+  page,
+}) => {
+  // Navigate to the page containing the REPLInput component
+  await page.goto("http://localhost:8000/");
+
+  // Log in and submit the command "mode brief"
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+  await page.fill('input[type="text"]', "mode brief");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the history to update with the command and its output
+  await page.waitForSelector('div:has-text("Switched to brief mode")');
+
+  // Verify that the current mode is displayed as "brief"
+  const currentMode = await page.textContent(
+    'legend:has-text("Current Mode: brief")'
+  );
+  expect(currentMode).toBeTruthy();
+});
+
+// tests loading
+test("load_file successfully loads data and displays confirmation message", async ({
+  page,
+}) => {
+  // Navigate to the page containing the REPL component
+  await page.goto("http://localhost:8000/");
+
+  // Perform the login action
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+
+  // Interact with the components to execute the load_file command
+  const commandInput = await page.waitForSelector('input[type="text"]');
+  await commandInput.type("load_file exampleCSV1.csv");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the confirmation message to appear
+  await page.waitForSelector('div:has-text("File Loaded Successfully")');
+
+  // Execute the view command
+  await commandInput.type("view");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the table to appear in the search history
+  await page.waitForSelector(".output-table");
+
+  // Verify that the table appears correctly in the search history
+  const tableRows = await page.$$(".output-table tbody tr");
+  expect(tableRows.length).toBeGreaterThan(0);
+});
+
+test("load_file successfully loads data and search command returns correct results", async ({
+  page,
+}) => {
+  // Navigate to the page containing the REPL component
+  await page.goto("http://localhost:8000/");
+
+  // Perform the login action
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+
+  // Interact with the components to execute the load_file command
+  const commandInput = await page.waitForSelector('input[type="text"]');
+  await commandInput.type("load_file exampleCSV1.csv");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the confirmation message to appear
+  await page.waitForSelector('div:has-text("File Loaded Successfully")');
+
+  // Execute the search command
+  await commandInput.type("search 1The");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the search results to appear
+  await page.waitForSelector(".output-table");
+
+  // Verify that the search results are correct
+  const tableRows = await page.$$(".output-table tbody tr");
+  expect(tableRows.length).toBeGreaterThan(0);
+
+  // Check if the search results match the mocked results
+  const firstRowCells = await tableRows[0].$$(".output-cell");
+  const cellTexts = await Promise.all(
+    firstRowCells.map((cell) => cell.textContent())
+  );
+  expect(cellTexts).toEqual(["The", "song", "remains", "the", "same."]);
+});
+
+test("user can sign out after logging in", async ({ page }) => {
+  // Navigate to the page containing the application
+  await page.goto("http://localhost:8000/");
+
+  // Perform the login action
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+
+  // Wait for the sign-out button to appear after successful login
+  await page.waitForSelector('button[aria-label="Sign Out"]');
+
+  // Click the sign-out button
+  await page.click('button[aria-label="Sign Out"]');
+
+  // Wait for the login form to appear after signing out
+  await page.waitForSelector('input[type="text"]');
 });
