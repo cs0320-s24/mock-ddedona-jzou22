@@ -184,3 +184,24 @@ test("user can sign out after logging in", async ({ page }) => {
   // Wait for the login form to appear after signing out
   await page.waitForSelector('input[type="text"]');
 });
+
+test("Invalid command test", async ({ page }) => {
+  // Navigate to the page containing the REPL component
+  await page.goto("http://localhost:8000/");
+
+  // Perform the login action
+  await page.fill('input[type="text"]', "@brown.edu");
+  await page.click('button[aria-label="Login"]');
+
+  // Enter an invalid command
+  await page.fill('input[type="text"]', "invalid_command");
+  await page.click('button:has-text("Submit")');
+
+  // Wait for the error message to appear
+  const errorMessage = await page.waitForSelector(
+    'div:has-text("Unknown command: invalid_command")'
+  );
+
+  // Assert that the error message is displayed
+  expect(errorMessage).toBeTruthy();
+});
