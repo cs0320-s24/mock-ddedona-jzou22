@@ -149,7 +149,7 @@ test("load_file successfully loads data and search command returns correct resul
   await page.waitForSelector('div:has-text("File Loaded Successfully")');
 
   // Execute the search command
-  await commandInput.type("search 1The");
+  await commandInput.type("search 1 The");
   await page.click('button:has-text("Submit")');
 
   // Wait for the search results to appear
