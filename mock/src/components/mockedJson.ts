@@ -61,10 +61,18 @@ mockedDataMap.set("exampleCSV3.csv", exampleCSV3);
 mockedDataMap.set("header.csv", header);
 mockedDataMap.set("noHeader.csv", noHeader);
 
-export const mockedResultsMap = new Map<string, string[][]>();
+export const mockedResultsMap = new Map<string, string[][] | string>();
 
 const exampleCSV11The = [["The", "song", "remains", "the", "same."]];
 const exampleCSV11Song = [["The", "song", "remains", "the", "same."]];
+const exampleCSV1Coding = [["Why", "am", "I", "still", "coding"]];
 
 mockedResultsMap.set("1The", exampleCSV11The);
 mockedResultsMap.set("1Song", exampleCSV11Song);
+mockedResultsMap.set("coding", exampleCSV1Coding);
+
+const noHeaderCSVValid = [["col_1_row_1", "col_2_row_1", "col_3_row_1"]];
+const noHeaderCSVInvalid = "No matching rows found.";
+
+mockedResultsMap.set("col_1_row_1", noHeaderCSVValid);
+mockedResultsMap.set("1col_1_row_1", noHeaderCSVInvalid);
